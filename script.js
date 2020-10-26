@@ -1,15 +1,19 @@
 const app = (function () {
   const game = {};
-  const suites = ["spades", "diamonds", "hearts", "clubs"];
+  const suites = ["spades", "diams", "hearts", "clubs"];
   const ranks = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
 
   function init() {
     console.log("init ready");
     gameBoardBuild();
+    turnBtnOff(game.hitBtn);
+    turnBtnOff(game.standBtn);
     buildDeck();
     shuffleDeck();
+    addClick();
   }
 
+  //Build Deck
   function buildDeck() {
     game.deck = [];
     for (let i = 0; i < suites.length; i++) {
@@ -24,12 +28,85 @@ const app = (function () {
       }
     }
   }
-
+  //Shuffle Deck
   function shuffleDeck() {
     game.deck.sort(() => Math.random() - 0.5);
     console.log(game.deck);
   }
 
+  // Adding on click functions
+  function addClick() {
+    game.dealBtn.addEventListener("click", dealHand);
+    game.hitBtn.addEventListener("click", playerHit);
+    game.standBtn.addEventListener("click", playerStand);
+    // game.betBtn.addEventListener('click', bet)
+  }
+  // click functions below
+  function dealHand() {
+    game.dealerHand = [];
+    game.playerHand = [];
+    game.start = true;
+    turnBtnOff(game.dealBtn);
+    game.dealerCards.innerHTML = "";
+    game.playerCards.innerHTML = "";
+    drawCard(game.dealerHand, game.dealerCards, true);
+    drawCard(game.dealerHand, game.dealerCards, false);
+    drawCard(game.playerHand, game.playerCards, false);
+    drawCard(game.playerHand, game.playerCards, false);
+  }
+
+  function playerHit() {}
+
+  function playerStand() {}
+
+  //functions for drawing the cards to start the game
+  function drawCard(hand, el, h) {
+    let firstCard = game.deck.shift();
+    hand.push(firstCard);
+    showCard(firstCard, el, h);
+  }
+
+  function showCard(card, el, h) {
+    if (card != undefined) {
+      el.style.backgroundColor = "white";
+      let cardDiv = document.createElement("div");
+      cardDiv.classList.add("card");
+      if (card.suite === "hearts" || card.suite === "diams") {
+        cardDiv.classList.add("red");
+      }
+      if (h) {
+        cardDiv.classList.add("hidden");
+      }
+      let cardSpan = document.createElement("div");
+      cardSpan.innerHTML = card.rank + "&" + card.suite + ";";
+      cardSpan.classList.add("tiny");
+      cardDiv.appendChild(cardSpan);
+
+      let rankSpan = document.createElement("div");
+      rankSpan.innerHTML = card.rank;
+      rankSpan.classList.add("big");
+      cardDiv.appendChild(rankSpan);
+
+      let suiteSpan = document.createElement("div");
+      suiteSpan.innerHTML = "&" + card.suite + ";";
+      suiteSpan.classList.add("big");
+      cardDiv.appendChild(suiteSpan);
+
+      el.appendChild(cardDiv);
+    }
+  }
+
+  // functions to disable and enable the hit / stand / deal / bet buttons at certain times
+  function turnBtnOff(btn) {
+    btn.disabled = true;
+    btn.style.backgroundColor = "#ddd";
+  }
+  function turnBtnOn() {
+    btn.disabled = false;
+    btn.style.backgroundColor = "#000";
+  }
+
+  //Build Gameboard
   function gameBoardBuild() {
     game.main = document.querySelector("#game-content");
     game.scoreboard = document.createElement("div");
@@ -52,7 +129,6 @@ const app = (function () {
 
     game.dealerScore = document.createElement("div");
     game.dealerScore.textContent = "-";
-    game.playerCards = document.createElement("div");
     game.dealerScore.classList.add("score");
     game.dealer.append(game.dealerScore);
 
@@ -67,12 +143,12 @@ const app = (function () {
 
     game.playerScore = document.createElement("div");
     game.playerScore.textContent = "-";
-    game.playerCards = document.createElement("div");
     game.playerScore.classList.add("score");
     game.player.append(game.playerScore);
 
     // Game Dashboard
     game.dashboard = document.createElement("div");
+    game.dashboard.classList.add("dashboard");
     game.main.append(game.dashboard);
 
     game.status = document.createElement("div");
