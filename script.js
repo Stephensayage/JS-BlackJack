@@ -7,6 +7,7 @@ const app = (function () {
     console.log("init ready");
     gameBoardBuild();
     buildDeck();
+    shuffleDeck();
   }
 
   function buildDeck() {
@@ -22,6 +23,10 @@ const app = (function () {
         game.deck.push(card);
       }
     }
+  }
+
+  function shuffleDeck() {
+    game.deck.sort(() => Math.random() - 0.5);
     console.log(game.deck);
   }
 
