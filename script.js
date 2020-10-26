@@ -6,6 +6,23 @@ const app = (function () {
   function init() {
     console.log("init ready");
     gameBoardBuild();
+    buildDeck();
+  }
+
+  function buildDeck() {
+    game.deck = [];
+    for (let i = 0; i < suites.length; i++) {
+      for (let j = 0; j < ranks.length; j++) {
+        let card = {};
+        let cardValue = isNaN(ranks[j]) ? 10 : ranks[j];
+        cardValue = ranks[j] == "A" ? 11 : cardValue;
+        card.suite = suites[i];
+        card.rank = ranks[j];
+        card.value = cardValue;
+        game.deck.push(card);
+      }
+    }
+    console.log(game.deck);
   }
 
   function gameBoardBuild() {
