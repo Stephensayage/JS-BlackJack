@@ -53,11 +53,86 @@ const app = (function () {
     drawCard(game.dealerHand, game.dealerCards, false);
     drawCard(game.playerHand, game.playerCards, false);
     drawCard(game.playerHand, game.playerCards, false);
+    updateCounter();
   }
 
-  function playerHit() {}
+  // functions to keep track of the game and hand count
+  function findWinner() {
+    let player = score(game.playerHand);
+    let dealer = score(game.dealerHand);
+  }
 
-  function playerStand() {}
+  function dealerPlay() {
+    let dealer = score(game.dealerHand);
+    game.status.textContent = "Dealer has " + dealer;
+    if (dealer >= 17) {
+      game.dealerScore.textContent = dealer;
+      findWinner();
+    } else {
+      drawCard(game.dealerHand, game.dealerCards, false);
+      game.dealerScore.textContent = dealer;
+      dealerPlay();
+    }
+  }
+
+  function updateCounter() {
+    let player = score(game.playerHand);
+    let dealer = score(game.dealerHand);
+    console.log(player, dealer);
+    game.playerScore.textContent = "The players current hand total " + player;
+    game.dealerScore.textContent = "The dealer is showing ";
+    if (player < 21) {
+      turnBtnOn(game.hitBtn);
+      turnBtnOn(game.standBtn);
+      game.status.textContent =
+        "Stand at " + player + " or hit for another card";
+    } else if (player > 21) {
+      findWinner();
+    } else {
+      dealerPlay(dealer);
+    }
+  }
+
+  function scoreAce(value, aces) {
+    if (value < 21) {
+      return value;
+    } else if (aces > 0) {
+      ace--;
+      value = value - 10; // subtracts 10 from the ace
+      return scoreAce(value, aces);
+    } else {
+      return value;
+    }
+  }
+
+  function score(hand) {
+    let total = 0;
+    let ace = 0;
+    hand.forEach(function (card) {
+      if (card.rank == "A") {
+        ace++;
+      }
+      total += Number(card.value);
+    });
+    if (ace > 0 && total > 21) {
+      total = scoreAce(total, ace);
+    }
+
+    return Number(total);
+  }
+
+  //Player options during game
+  function playerHit() {
+    drawCard(game.playerHand, game.playerCards, false);
+    updateCounter();
+  }
+
+  function playerStand() {
+    removeHidden();
+    dealerPlay();
+    turnBtnOff(game.standBtn);
+    turnBtnOff(game.hitBtn);
+  }
 
   //functions for drawing the cards to start the game
   function drawCard(hand, el, h) {
@@ -96,14 +171,19 @@ const app = (function () {
     }
   }
 
+  function removeHidden() {
+    let hidden = document.getElementsByClassName("hidden");
+    hidden[0].classList.remove("hidden");
+  }
+
   // functions to disable and enable the hit / stand / deal / bet buttons at certain times
   function turnBtnOff(btn) {
     btn.disabled = true;
     btn.style.backgroundColor = "#ddd";
   }
-  function turnBtnOn() {
+  function turnBtnOn(btn) {
     btn.disabled = false;
-    btn.style.backgroundColor = "#000";
+    btn.classList.add("btn");
   }
 
   //Build Gameboard
@@ -153,7 +233,7 @@ const app = (function () {
 
     game.status = document.createElement("div");
     game.status.classList.add("message");
-    game.status.textContent = "Message for Player";
+    game.status.textContent = "Click Deal to being";
     game.dashboard.append(game.status);
     // Dashboard Buttons
     // Deal Cards

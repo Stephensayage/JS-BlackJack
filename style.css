@@ -73,3 +73,7 @@ body {
   padding: 15px;
   font-size: 24px;
 }
+.score {
+  margin: 15px 0 10px 15px;
+  font-size: 20px;
+}
