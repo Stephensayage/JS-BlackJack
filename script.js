@@ -58,19 +58,36 @@ const app = (function () {
 
   // functions to keep track of the game and hand count
   function findWinner() {
+    turnBtnOff(game.hitBtn);
+    turnBtnOff(game.standBtn);
     let player = score(game.playerHand);
     let dealer = score(game.dealerHand);
+    if (player > 21) {
+      game.status.textContent = "You busted with " + player;
+    }
+    if (dealer > 21) {
+      game.status.textContent = "The dealer has busted with " + dealer;
+    }
+
+    if (player == dealer) {
+      game.status.textContent = "Push";
+    } else if ((player < 22 && player > dealer) || dealer > 21) {
+      game.status.textContent = "The player has won with " + player + ". ";
+    } else {
+      game.status.textContent = "The dealer wins with " + dealer;
+    }
+    turnBtnOn(game.dealBtn);
   }
 
   function dealerPlay() {
     let dealer = score(game.dealerHand);
     game.status.textContent = "Dealer has " + dealer;
     if (dealer >= 17) {
-      game.dealerScore.textContent = dealer;
+      game.dealerScore.textContent = "The dealers score is " + dealer;
       findWinner();
     } else {
       drawCard(game.dealerHand, game.dealerCards, false);
-      game.dealerScore.textContent = dealer;
+      game.dealerScore.textContent = "The dealers score is " + dealer;
       dealerPlay();
     }
   }
@@ -80,7 +97,7 @@ const app = (function () {
     let dealer = score(game.dealerHand);
     console.log(player, dealer);
     game.playerScore.textContent = "The players current hand total " + player;
-    game.dealerScore.textContent = "The dealer is showing ";
+    game.dealerScore.textContent = "";
     if (player < 21) {
       turnBtnOn(game.hitBtn);
       turnBtnOn(game.standBtn);
@@ -90,6 +107,7 @@ const app = (function () {
       findWinner();
     } else {
       dealerPlay(dealer);
+      removeHidden();
     }
   }
 
@@ -97,7 +115,7 @@ const app = (function () {
     if (value < 21) {
       return value;
     } else if (aces > 0) {
-      ace--;
+      aces--;
       value = value - 10; // subtracts 10 from the ace
       return scoreAce(value, aces);
     } else {
@@ -190,8 +208,9 @@ const app = (function () {
   function gameBoardBuild() {
     game.main = document.querySelector("#game-content");
     game.scoreboard = document.createElement("div");
-    game.scoreboard.textContent = "Dealer Score: 0 || Player Score: 0";
+    game.scoreboard.textContent = "Welcome to BLACKJACK";
     game.scoreboard.style.fontSize = "24px";
+    game.scoreboard.classList.add("header");
     game.main.append(game.scoreboard);
 
     game.table = document.createElement("div");
